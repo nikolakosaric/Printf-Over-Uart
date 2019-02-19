@@ -21,11 +21,6 @@ int main(void)
 {
   WDTCTL = WDTPW + WDTHOLD;                     // Disables watchdog timer
   configureUART1();                             // Configures UART1
-
-  printf("Hello World!\n");
-
-  char test = 'a';
-  printf("%c", test);
   while (1){
     __bis_SR_register(GIE);                     // Enables global interrupts
   }
@@ -33,14 +28,11 @@ int main(void)
 
 #pragma vector=USCI_A1_VECTOR
 __interrupt void UART1(void) {
-    char temp = 0;
     P1OUT |= BIT0;                              // Turns on the P1.0 LED
     if (UCA1IFG & UCTXIFG) {                    // If the TX interrupt flag is triggered
         UCA1IFG &= ~UCTXIFG;                    // Clears the TX interrupt flag
     } if (UCA1IFG & UCRXIFG){                   // If the RX interrupt flag is triggered
-        temp = UCA1RXBUF;
-        printf("Message Received\n");
-        printf(" %c", temp);
+        UCA1TXBUF = UCA1RXBUF;
     }
     P1OUT &= ~BIT0;                             // Turns off the P1.0 LED
 }
